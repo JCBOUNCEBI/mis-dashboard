@@ -1,0 +1,375 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Salon SBM Dashboard</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#eef1f5;--card:#fff;--tt:#f6f8fb;--ink:#1d2733;--mut:#5f6b7a;--line:#dde3ea;--a:#4e79a7;--b:#f28e2b;--c:#59a14f;--red:#e15759;--w:#fff;--nav:#1b2a41;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f1724;--card:#172131;--tt:#1c2a3f;--ink:#e8edf5;--mut:#9aa8bd;--line:#2a3850;--a:#6aa0d6;--b:#f6a85a;--c:#7bc171;--red:#ff7b7e;--w:#0f1724;--nav:#0a111c}}
+:root[data-theme=dark]{--bg:#0f1724;--card:#172131;--tt:#1c2a3f;--ink:#e8edf5;--mut:#9aa8bd;--line:#2a3850;--a:#6aa0d6;--b:#f6a85a;--c:#7bc171;--red:#ff7b7e;--w:#0f1724;--nav:#0a111c}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 14px/1.5 Manrope,system-ui,sans-serif;min-height:100vh}
+#appRoot{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+aside{background:var(--nav);padding:20px 12px;position:sticky;top:0;height:100vh;overflow:auto;color:#dbe4f0}
+aside h1{font-size:18px;font-weight:800;margin:0 8px 2px;color:#fff}aside small{display:block;color:#8fa3bd;margin:0 8px 12px;font-size:12px}
+.gh{font-size:11px;font-weight:600;color:#7f93ad;margin:16px 10px 4px;letter-spacing:.04em}
+aside button{display:block;width:100%;text-align:left;border:0;border-left:3px solid transparent;background:none;color:#dbe4f0;font:600 13px Manrope,sans-serif;padding:8px 10px;border-radius:0 6px 6px 0;cursor:pointer}
+aside button:hover{background:#ffffff14}aside button.on{background:#ffffff1f;border-left-color:var(--b);color:#fff}aside button:focus-visible{outline:2px solid var(--b)}
+main{padding:0 24px 40px;min-width:0;max-width:1180px}
+.band{display:flex;flex-wrap:wrap;gap:8px;padding:14px 0 6px}.chip{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 12px;font-size:12px;color:var(--mut)}.chip b{color:var(--ink);margin-right:4px}
+h2.t{font-size:24px;margin:8px 0 0;font-weight:800}p.s{color:var(--mut);margin:2px 0 16px}
+section{display:none}section.on{display:block}
+.g{display:grid;gap:14px;margin-bottom:14px}.k{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}.k6{grid-template-columns:repeat(auto-fit,minmax(175px,1fr))}.two{grid-template-columns:repeat(auto-fit,minmax(330px,1fr))}.three{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.c{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:16px;min-width:0;box-shadow:0 1px 2px #0000000a}
+.c h3{font-size:12.5px;margin:-16px -16px 12px;padding:9px 16px;font-weight:700;color:var(--mut);background:var(--tt);border-bottom:1px solid var(--line);border-radius:6px 6px 0 0}
+.v{font-size:24px;font-weight:800}.d{font-size:12px;font-weight:600;color:var(--mut)}.up{color:var(--c)}.dn{color:var(--red)}
+.bar{height:8px;background:var(--line);border-radius:9px;margin:6px 0 10px;overflow:hidden}.bar i{display:block;height:100%;border-radius:9px;background:var(--a)}
+.t{border-left:5px solid var(--line)}.t.ok{border-left-color:var(--c)}.t.wr{border-left-color:#edc948}.t.bd{border-left-color:var(--red)}
+.t h3{margin:0 0 4px;padding:0;background:none;border:0}.tv{display:flex;justify-content:space-between;align-items:center;gap:8px}.t .v{font-size:26px}
+.hd{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:center;margin-bottom:14px}.hd h3{margin-bottom:6px}.hl{font-size:19px;font-weight:600;max-width:680px;line-height:1.4}
+.sc{display:flex;gap:14px;font-weight:600;font-size:13px}.sc i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+.bl{margin-bottom:12px}.bh{display:flex;justify-content:space-between;font-weight:600;font-size:13px}.bt{position:relative;height:12px;background:var(--line);border-radius:3px;margin:4px 0 2px}.bt i{display:block;height:100%;border-radius:3px;background:var(--red)}.bt.ok i{background:var(--c)}.bt.wr i{background:#edc948}.bt u{position:absolute;top:-3px;bottom:-3px;left:83.33%;width:2px;background:var(--ink)}
+.pl{border-left:4px solid var(--line);padding:2px 0 2px 12px;margin-bottom:12px}.pl.bd{border-color:var(--red)}.pl.wr{border-color:#edc948}.pl.ok{border-color:var(--c)}.pl b{font-size:13.5px}.pl p{margin:2px 0 0;color:var(--mut)}
+.ac{padding-left:18px;margin:0}.ac li{margin-bottom:9px}
+table{width:100%;border-collapse:collapse}th,td{text-align:right;padding:7px 6px;border-bottom:1px solid var(--line)}th:first-child,td:first-child{text-align:left}th{color:var(--mut);font-weight:600;font-size:12px}
+.w{overflow-x:auto}canvas{max-height:280px}ul{padding-left:18px;margin:0}li{margin-bottom:7px}select{font:600 13px Manrope;padding:7px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.w td:first-child,.w th:first-child{position:sticky;left:0;background:var(--card)}#xt td,#mt td{white-space:nowrap;line-height:1.35}td small{font-weight:400}
+.foot{color:var(--mut);font-size:12px;margin-top:18px}
+@media(max-width:760px){#appRoot{display:block}aside{position:static;height:auto;display:flex;gap:4px;overflow-x:auto;padding:10px}aside h1,aside small,.gh{display:none}aside button{white-space:nowrap;width:auto;border-left:0;border-radius:6px}main{padding:0 14px 30px}}
+
+.hidden{display:none!important}
+#authRoot{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--nav)}
+.ac{width:100%;max-width:400px;background:var(--card);border-radius:10px;padding:28px;box-shadow:0 8px 30px #0005}
+.ac .brand b{display:block;font-size:20px;font-weight:800}.ac .brand span{color:var(--mut);font-size:12.5px}
+.av{margin-top:18px}.av h2{font-size:17px;margin:0 0 6px}.av p{color:var(--mut);margin:0 0 12px}
+.av label{display:block;font-size:12.5px;font-weight:600;margin:10px 0 4px}
+.av input{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit}
+.av input:focus-visible,.btn:focus-visible{outline:2px solid var(--b)}
+.btn{display:block;width:100%;margin-top:16px;padding:10px;border:0;border-radius:6px;background:var(--a);color:var(--w);font:700 14px Manrope,sans-serif;cursor:pointer}
+.btn.ghost{background:none;color:var(--mut);border:1px solid var(--line)}.btn:disabled{opacity:.6;cursor:wait}
+.lnk{background:none;border:0;color:var(--a);font:600 12.5px Manrope;cursor:pointer;padding:0;margin-top:12px}
+.am{margin-top:14px;padding:9px 12px;border-radius:6px;font-size:13px}.am.err{background:#e1575722;color:var(--red)}.am.ok{background:#59a14f22;color:var(--c)}
+.usr{margin:18px 8px 0;padding-top:12px;border-top:1px solid #ffffff22;font-size:12px;color:#8fa3bd}.usr b{display:block;color:#fff;font-size:13px}
+.usr button{margin-top:6px;padding:6px 10px;border-radius:6px;border:1px solid #ffffff33;background:none;color:#dbe4f0;font:600 12px Manrope;cursor:pointer;width:auto}
+@media(max-width:760px){.usr{display:none}}
+#accModal{position:fixed;inset:0;background:#0009;z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:24px;overflow:auto}
+.am2{background:var(--card);border-radius:10px;max-width:1000px;width:100%;padding:20px}.amh{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:17px}
+.am2 input,.am2 select{padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit;font-size:13px;max-width:100%}
+.am2 table{font-size:13px}.am2 td{vertical-align:middle;text-align:left}.am2 button.s{padding:5px 9px;margin:2px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 12px Manrope;cursor:pointer}
+.pill{padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700}.pill.approved{background:#59a14f33;color:var(--c)}.pill.pending{background:#edc94855;color:var(--ink)}.pill.rejected,.pill.revoked{background:#e1575733;color:var(--red)}
+.arow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;align-items:center}
+</style></head><body>
+<div id="authRoot"><div class="ac"><div class="brand"><b>Management dashboard</b><span>Salon SBM · company data, approved access only</span></div>
+<div id="authMsg" class="am hidden" role="status"></div>
+<div id="loginView" class="av"><p>Sign in with the Google account your administrator has approved. This dashboard has no passwords.</p><button class="btn" id="gBtn">Continue with Google</button><p style="margin-top:14px;font-size:12px">First time here? Sign in once and your request goes to the administrator for approval.</p></div>
+<div id="msgView" class="av hidden"><h2 id="mTitle"></h2><p id="mText"></p><div id="mAdmin" class="hidden"><label for="upFile">Upload dashboard data (admin)</label><input id="upFile" type="file" accept=".json,application/json"></div><button class="btn ghost" id="mOut">Sign out</button></div>
+<div id="loadView" class="av hidden"><p>Checking your access…</p></div></div></div>
+<div id="appRoot" class="hidden"><aside><h1 id="sname">Salon</h1><small>Management dashboard</small><div id="nav"></div>
+<div class="usr"><b id="uName"></b><span id="uRole"></span><div id="storeSel"></div><button id="accBtn" class="hidden">Manage access</button> <button id="upBtn" class="hidden">Upload data</button> <button id="outBtn">Sign out</button><input id="upFile2" type="file" accept=".json,application/json" class="hidden"></div></aside><main id="m"></main></div>
+<div id="accModal" class="hidden" role="dialog" aria-label="Manage access"><div class="am2"><div class="amh"><b>Manage access</b><button id="accClose" class="lnk" style="margin:0">Close</button></div><div id="accBody"></div></div></div>
+<script>
+const SUPABASE_URL="https://mldzrfkjfbgvvlcqiuir.supabase.co",SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1sZHpyZmtqZmJndnZsY3FpdWlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwNjQzMzMsImV4cCI6MjA5ODY0MDMzM30.sLI-va54I96WBYNAGjI3YF_1Q-qHqsL_3JzA_gFyJKg";
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+let me=null,rows=[],busy=false;
+const $=id=>document.getElementById(id),VIEWS=['loginView','msgView','loadView'];
+const esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function show(v){$('appRoot').classList.add('hidden');$('accModal').classList.add('hidden');$('authRoot').classList.remove('hidden');VIEWS.forEach(x=>$(x).classList.toggle('hidden',x!==v));}
+function note(t,k){const b=$('authMsg');if(!t){b.classList.add('hidden');return}b.textContent=t;b.className='am '+(k||'err');}
+function stop(title,text,admin){note('');$('mTitle').textContent=title;$('mText').textContent=text;$('mAdmin').classList.toggle('hidden',!admin);show('msgView');}
+const isAdmin=()=>me&&me.role==='admin'&&me.status==='approved';
+const amr=tok=>{try{return JSON.parse(atob(tok.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).amr||[]}catch(e){return[]}};
+async function afterLogin(session){
+  if(busy)return;busy=true;
+  try{
+    show('loadView');
+    if(!amr(session.access_token).some(a=>a.method==='oauth')){await sb.auth.signOut();show('loginView');note('Password sign-in is not allowed for this dashboard. Please use Google.');return}
+    const{data,error}=await sb.rpc('sbm_get_or_request_access',{p_name:(session.user.user_metadata||{}).full_name||null});
+    if(error){stop('Could not check your access',error.message+' (Has the setup SQL been run?)',false);return}
+    me=Array.isArray(data)?data[0]:data;
+    if(me.status==='approved'){await loadData();return}
+    if(me.status==='pending'){stop('Access request sent','Your request for '+me.email+' is waiting for administrator approval. You can open the dashboard once it is approved.',false);return}
+    stop('Access not available','Access for '+me.email+' has been removed or declined. Contact your administrator.',false);
+  }finally{busy=false}
+}
+async function loadData(){
+  show('loadView');const{data,error}=await sb.from('sbm_salon_data').select('salon,payload,updated_at').order('salon');
+  if(error){stop('Could not load data',error.message,isAdmin());return}
+  rows=data||[];
+  if(!rows.length){const sl=(me.salons||[]).filter(Boolean);if(isAdmin())stop('No data uploaded yet','Upload the dashboard data file to get started.',true);else if(sl.length)stop('Data not loaded yet','You are approved for '+sl.join(', ')+', but dashboard data for '+(sl.length>1?'these salons has':'this salon has')+' not been loaded yet. Ask your administrator.',false);else stop('No salons assigned','No salon is assigned to your account yet. Ask your administrator.',false);return}
+  enterApp();
+}
+function enterApp(){
+  $('uName').textContent=me.full_name||me.email;$('uRole').textContent=me.role==='admin'?'Admin':'Viewer · '+(me.salons||[]).join(', ');
+  $('upBtn').classList.toggle('hidden',!isAdmin());$('accBtn').classList.toggle('hidden',!isAdmin());
+  const ss=$('storeSel');ss.innerHTML=rows.length>1?'<select id="salonPick" aria-label="Salon" style="margin-top:8px;width:100%">'+rows.map((r,i)=>`<option value="${i}">${esc(r.salon)}</option>`).join('')+'</select>':'';
+  if(rows.length>1)$('salonPick').onchange=e=>render(rows[e.target.value]);
+  $('authRoot').classList.add('hidden');$('appRoot').classList.remove('hidden');note('');render(rows[0]);
+}
+function render(r){const p=r.payload;$('sname').textContent=r.salon;bootDashboard(p.D,p.NS,{salon:r.salon,month:p.meta.month,asOf:p.meta.asOf});}
+async function upload(file){
+  try{const p=JSON.parse(await file.text());if(!p.salon||!p.D||!p.NS||!p.meta)throw new Error('This is not a dashboard data file.');
+    const{error}=await sb.from('sbm_salon_data').upsert({salon:p.salon,payload:p,updated_at:new Date().toISOString()});if(error)throw error;await loadData();}
+  catch(e){alert('Upload failed: '+e.message)}
+}
+$('upFile').onchange=e=>e.target.files[0]&&upload(e.target.files[0]);
+$('upBtn').onclick=()=>$('upFile2').click();$('upFile2').onchange=e=>e.target.files[0]&&upload(e.target.files[0]);
+async function out(){await sb.auth.signOut();me=null;rows=[];show('loginView')}
+$('outBtn').onclick=out;$('mOut').onclick=out;
+$('gBtn').onclick=async()=>{note('');const{error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+location.pathname,queryParams:{prompt:'select_account'}}});if(error)note(error.message)};
+// ---- Admin: manage access ----
+async function openAccess(msg,kind){
+  $('accModal').classList.remove('hidden');const B=$('accBody');B.textContent='Loading…';
+  const{data,error}=await sb.from('sbm_access').select('*').order('requested_at',{ascending:false});
+  if(error){B.textContent=error.message;return}
+  const known=[...new Set(rows.map(r=>r.salon))];
+  const sel=v=>['viewer','admin'].map(x=>`<option${x===v?' selected':''}>${x}</option>`).join('');
+  B.innerHTML=`${msg?`<div class="am ${kind||'ok'}" role="status">${esc(msg)}</div>`:''}<datalist id="salonList">${known.map(x=>`<option value="${esc(x)}">`).join('')}</datalist>
+  <form id="addAcc" class="arow"><b>Pre-approve:</b><input id="aEmail" type="email" required placeholder="name@gmail.com"><input id="aSal" list="salonList" placeholder="Salons, comma separated"><select id="aRole">${sel('viewer')}</select><button class="s">Add and approve</button></form>
+  <div class="w"><table><thead><tr><th>Person</th><th>Status</th><th>Role</th><th>Salons (comma separated)</th><th>Last sign-in</th><th></th></tr></thead><tbody>${data.map(r=>`<tr data-e="${esc(r.email)}"><td>${esc(r.full_name||'')}<br><small class="d">${esc(r.email)}</small></td><td><span class="pill ${r.status}">${r.status}</span></td><td><select class="rl">${sel(r.role)}</select></td><td><input class="sl" list="salonList" value="${esc((r.salons||[]).join(', '))}"></td><td>${r.last_login_at?new Date(r.last_login_at).toLocaleDateString('en-IN',{day:'numeric',month:'short'}):'–'}</td><td style="white-space:nowrap"><button class="s" data-a="approved">Approve</button><button class="s" data-a="rejected">Reject</button><button class="s" data-a="revoked">Revoke</button><button class="s" data-a="save">Save</button></td></tr>`).join('')||'<tr><td colspan="6">No requests yet.</td></tr>'}</tbody></table></div>`;
+  $('addAcc').onsubmit=async e=>{e.preventDefault();const role=$('aRole').value,sal=parse($('aSal').value);
+    if(role!=='admin'&&!sal.length){alert('Enter at least one salon for a viewer.');return}
+    const email=$('aEmail').value.trim().toLowerCase();
+    const{data:r,error}=await sb.from('sbm_access').upsert({email,status:'approved',role,salons:sal,decided_at:new Date().toISOString(),decided_by:me.email}).select();
+    if(error)alert(error.message);else if(!r||!r.length)alert('Nothing was saved. Sign out and in again, then retry.');else openAccess(email+' approved for '+(role==='admin'?'all salons':sal.join(', '))+'.')};
+  B.onclick=async e=>{const b=e.target.closest('button[data-a]');if(!b)return;const tr=b.closest('tr'),em=tr.dataset.e,a=b.dataset.a;
+    if(em===me.email&&a!=='save'&&a!=='approved'){alert('You cannot remove your own access.');return}
+    const role=tr.querySelector('.rl').value,sal=parse(tr.querySelector('.sl').value);
+    if((a==='approved'||a==='save')&&role!=='admin'&&!sal.length&&!confirm('No salon is entered, so this person will see nothing. Continue anyway?'))return;
+    const patch={role,salons:sal,decided_at:new Date().toISOString(),decided_by:me.email};if(a!=='save')patch.status=a;
+    const{data:r,error}=await sb.from('sbm_access').update(patch).eq('email',em).select();
+    if(error)alert(error.message);else if(!r||!r.length)alert('Nothing was saved. Sign out and in again, then retry.');else openAccess('Saved: '+em+' · '+(a==='save'?'details updated':a)+' · salons: '+(role==='admin'?'all (admin)':(sal.join(', ')||'none')))};
+}
+const parse=t=>t.split(',').map(x=>x.trim()).filter(Boolean);
+$('accBtn').onclick=openAccess;$('accClose').onclick=()=>$('accModal').classList.add('hidden');
+sb.auth.onAuthStateChange(ev=>{if(ev==='SIGNED_OUT'&&!$('appRoot').classList.contains('hidden')){me=null;show('loginView')}});
+function bootDashboard(D,NS,META){
+document.getElementById('m').innerHTML='';document.getElementById('nav').innerHTML='';
+D.mtd=Object.fromEntries(Object.entries(D.mtdv).map(([k,v])=>[k,Object.fromEntries(D.mtdh.map((h,i)=>[h,v[i]]))]));
+const S=getComputedStyle(document.documentElement),col=n=>S.getPropertyValue(n).trim();
+Chart.defaults.font.family='Manrope,sans-serif';Chart.defaults.color=col('--mut');Chart.defaults.borderColor=col('--line');
+const A=col('--a'),B=col('--b'),C=col('--c'),Y='#edc948',G='#bab0ac',M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const inr=x=>Math.round(x).toLocaleString('en-IN'),pc=(a,b)=>((a/b-1)*100).toFixed(1),num=x=>typeof x=='string'?+x.replace(/,/g,''):x;
+const kpi=(l,v,d,p)=>`<div class="c"><h3>${l}</h3><div class="v">${v}</div>${p!=null?`<div class="bar"><i style="width:${Math.min(p,100)}%"></i></div>`:''}<div class="d">${d||''}</div></div>`;
+const cv=id=>`<div class="c"><h3>${id[1]}</h3><canvas id="${id[0]}"></canvas></div>`;
+const prog=(l,a,t,u)=>{const p=a/t*100;return `<div><b>${l}</b> <span class="d">${a}${u} of ${t}${u} · ${p.toFixed(1)}%</span><div class="bar"><i style="width:${Math.min(p,100)}%;background:${p>=95?C:p>=80?Y:col('--red')}"></i></div></div>`};
+const ch=(id,type,labels,sets,o={})=>new Chart(document.getElementById(id),{type,data:{labels,datasets:sets},options:Object.assign({responsive:true,plugins:{legend:{display:sets.length>1||type=='doughnut'}}},o)});
+const bar=(id,l,d,c,o)=>ch(id,'bar',l,[{data:d,backgroundColor:c||A,borderRadius:6}],o);
+const dn=(id,l,d)=>ch(id,'doughnut',l,[{data:d,backgroundColor:[A,B,C,Y,G],borderWidth:0}]);
+const tbl=(h,r)=>`<div class="w"><table><thead><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${r.map(x=>`<tr>${x.map(y=>`<td>${y}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+const P=[],page=(id,name,sub,html,fn)=>P.push({id,name,sub,html,fn});
+const m=D.mtd,cy=m['MTD CURRENT YEAR'],ly=m['MTD LAST YEAR'];
+
+page('pre','Prebooking','Tomorrow’s forecast from booked appointments',
+`<div class="g k">${kpi('Clients booked',11,'')}${kpi('Services booked',21,'7 hair · 8 beauty · 5 mani-pedi · 1 Trica')}${kpi('Pre-booked value','₹40,478','Hair ₹20,423 · Beauty ₹10,920')}${kpi('Pre-booking vs target','99.2%','1.83 booked vs 1.85 target',99.2)}</div>
+<div class="g two">${cv(['p1','Services booked by department'])}${cv(['p2','Value by department (₹)'])}</div>
+<div class="c"><h3>Read-out</h3><ul><li>Pre-booking has reached 99% of the target, so the day is almost fully planned.</li><li>Hair is half the booked value (₹20.4 K for 7 services, about ₹2,900 each), so a missed hair slot costs the most.</li><li>Nails have nothing booked yet — a call-out to lapsed nail clients could fill the gap.</li></ul></div>`,
+()=>{bar('p1',['Hair','Beauty','Mani-pedi','Nails','Trica'],[7,8,5,0,1]);dn('p2',['Hair','Beauty','Mani-pedi'],[20423,10920,9135])});
+
+page('tgt','Target vs achievement','Net + redemption (₹ lakh), slabs and product target',
+`<div class="g two"><div class="c"><h3>Net + redemption</h3>${prog('Today',1.52,1.49,' L')}${prog('Month to date',25.31,30.43,' L')}${prog('Current run (projected)',34.11,37,' L')}</div>
+<div class="c"><h3>Slabs and product target</h3>${prog('Slab 1 (₹37 L)',25.31,37,' L')}${prog('Slab 2 (₹41 L)',25.31,41,' L')}${prog('Product sales (₹4.5 L)',2.18,4.5,' L')}</div></div>
+<div class="g two">${cv(['t1','Target vs actual (₹ lakh)'])}<div class="c"><h3>What it takes to finish the month</h3><ul><li><b>₹11.69 L</b> more is needed to clear Slab 1; with 7 days left that is about <b>₹1.67 L a day</b>, against ₹1.52 L today.</li><li>Slab 2 needs ₹15.69 L more, or about ₹2.24 L a day, which is a stretch.</li><li>Product sales need ₹2.32 L more; at 48.5% this is the weakest target.</li></ul></div></div>`,
+()=>ch('t1','bar',['Today','MTD','Current run'],[{label:'Target',data:[1.49,30.43,37],backgroundColor:G,borderRadius:6},{label:'Actual',data:[1.52,25.31,34.11],backgroundColor:A,borderRadius:6}]));
+
+const mk=['Total Clients','New Clients','No Of Bills','Products_Count'];
+page('mtd','MTD comparison','Today, month to date, last year and last month',
+`<div class="g k">${kpi('Net + redemption MTD','₹'+cy['Net + Redemption'],pc(num(cy['Net + Redemption']),num(ly['Net + Redemption']))+'% vs last year')}${kpi('Net cash MTD','₹'+inr(cy['Net Cash']),pc(cy['Net Cash'],ly['Net Cash'])+'% vs last year')}${kpi('Avg bill value','₹'+inr(cy['TOTAL ATV']),pc(cy['TOTAL ATV'],ly['TOTAL ATV'])+'% vs last year')}${kpi('Discount','₹'+inr(cy.Discount),(cy.Discount/cy['Net Cash']*100).toFixed(1)+'% of net cash')}</div>
+<div class="g two">${cv(['m1','This year vs last year, MTD'])}<div class="c"><h3>Metric table</h3>${tbl(['Metric','Today','MTD','Last year','Change'],['Total Clients','New Clients','Existing Clients','No Of Bills','Services_Count','Products_Count','TOTAL ATV','Avg Service Price'].map(k=>[k.replace('_',' '),inr(m.FTD[k]),inr(cy[k]),inr(ly[k]),`<span class="${cy[k]>=ly[k]?'up':'dn'}">${pc(cy[k],ly[k])}%</span>`]))}</div></div>
+<p class="foot">Services sales shows #VALUE! in the source sheet, so it is left out. The “last month” block repeats this month’s figures and needs checking.</p>`,
+()=>ch('m1','bar',mk,[{label:'Last year',data:mk.map(k=>ly[k]),backgroundColor:G,borderRadius:6},{label:'This year',data:mk.map(k=>cy[k]),backgroundColor:A,borderRadius:6}]));
+
+const E=D.emp,dep=Object.entries(D.dept).filter(x=>x[1][1]>0);
+page('emp','Employee performance','Service and product sales by team member',
+`<div class="g k">${kpi('Team service revenue','₹'+inr(dep.reduce((a,x)=>a+x[1][1],0)),'')}${kpi('Product sales','₹'+inr(dep.reduce((a,x)=>a+x[1][2],0)),'')}${kpi('Top earner',E[0][0].split(' ')[0],'₹'+inr(E[0][2]))}${kpi('Active staff',dep.reduce((a,x)=>a+x[1][0],0),'3 managers excluded')}</div>
+<div class="g two">${cv(['e1','Service revenue by department (₹ thousand)'])}${cv(['e2','Top 10 by service revenue (₹ thousand)'])}</div>
+<div class="c"><h3>Leaderboard</h3>${tbl(['Name','Dept','Service ₹','Product ₹','Services','Bill value ₹'],E.map(e=>[e[0],e[1].split(' ')[0].toLowerCase(),inr(e[2]),inr(e[3]),e[4],inr(e[5])]))}</div>
+<p class="foot">Hair earns 62% of service revenue and 78% of product sales. Amir Khan has the highest bill value at ₹5,196; Kalpana Kamble does the most services (177).</p>`,
+()=>{bar('e1',dep.map(x=>x[0].split(' ')[0]),dep.map(x=>Math.round(x[1][1]/1000)),C);bar('e2',E.map(e=>e[0].split(' ')[0]),E.map(e=>Math.round(e[2]/1000)),B,{indexAxis:'y'})});
+
+const gl=D.glow,gm=gl.map(g=>M[g[0]-1]),gx=D.glowlist;
+page('glow','Glow membership','Members added, benefits used and expiry status',
+`<div class="g k">${kpi('Members (calling list)',689,'546 women · 143 men')}${kpi('Added since Feb',73,'peak: 18 in June')}${kpi('Expired 90+ days','88%','607 of 689 members',88)}${kpi('Free sessions unused',inr(gx.bal),'balance across members')}</div>
+<div class="g two">${cv(['g1','Members added vs cumulative base'])}${cv(['g2','Membership status'])}</div>${cv(['g3','Spend by existing Glow members (₹ thousand)']).replace('class="c"','class="c" style="margin-bottom:14px"')}
+<div class="c"><h3>Opportunity</h3><ul><li>Only 31 memberships are active; 658 have expired, so renewal calling is the largest lever.</li><li>New sign-ups have slowed to 2 in September and 1 so far in October, from 13 in August.</li><li>Cumulative Glow members spend ₹2.0 L in September, a sign they are worth keeping.</li></ul></div>`,
+()=>{ch('g1','bar',gm,[{label:'Added',data:gl.map(g=>g[1]),backgroundColor:A,borderRadius:6},{label:'Cumulative base',data:gl.map(g=>g[2]),type:'line',borderColor:C}]);dn('g2',Object.keys(gx.exp),Object.values(gx.exp));ch('g3','line',gm,[{data:gl.map(g=>Math.round(g[3]/1000)),borderColor:B,backgroundColor:B+'22',fill:true,tension:.3}])});
+
+const cc=D.catcmp;
+page('cat','Category performance','Service counts, January to September (completed months), this year vs last year',
+`<div class="g">${cv(['c1','Top categories, Jan–Sep'])}</div>
+<div class="c w"><h3>Change by category</h3>${tbl(['Category','Jan–Sep 2025','Jan–Sep 2026','Change'],cc.map(c=>[c[0].toLowerCase(),inr(c[1]),inr(c[2]),`<span class="${c[2]>=c[1]?'up':'dn'}">${pc(c[2],c[1])}%</span>`]))}</div>
+<p class="foot">Female waxing is down 13.3% and male cuts down 13.6%, while female touch-ups are up 21%. Unique waxing clients are down 15.6%. Compared over January to September; October is still in progress.</p>`,
+()=>ch('c1','bar',cc.map(c=>c[0].toLowerCase()),[{label:'2025',data:cc.map(c=>c[1]),backgroundColor:G,borderRadius:4},{label:'2026',data:cc.map(c=>c[2]),backgroundColor:A,borderRadius:4}],{indexAxis:'y'}));
+
+page('inc','Incentives','Earned this month, by plan and by employee',
+`<div class="g k">${kpi('Total incentive','₹6,822','3 employees')}${kpi('Largest plan','Prepaid','₹2,600')}${kpi('Top earner','Kavita','₹3,650')}</div>
+<div class="g two">${cv(['i1','By incentive plan (₹)'])}${cv(['i2','By employee (₹)'])}</div>
+<p class="foot">Only 3 of 16 service staff have incentives this month, and Glow membership sales earned ₹0 despite 3 sales.</p>`,
+()=>{bar('i1',D.inc_t.map(x=>x[0].replace('Incentive','').replace('Trica ','T. ')),D.inc_t.map(x=>x[1]),B,{indexAxis:'y'});dn('i2',D.inc_e.map(x=>x[0]),D.inc_e.map(x=>x[1]))});
+
+const pm=D.promo_m,pmo=['May','Jun','Jul','Aug','Sep','Oct'];
+page('promo','Promotions','Campaign sales, discounts given and guest mix',
+`<div class="g k">${kpi('Discount given (May–Oct)','₹'+inr(D.promo_disc),'')}${kpi('Existing guests',475,'87% of campaign guests')}${kpi('New guests',73,'13%')}${kpi('Best campaign','Glow 10% Women','₹5.4 L invoiced')}</div>
+<div class="g two">${cv(['r1','Top campaigns, invoice value (₹ thousand)'])}${cv(['r2','Campaign sales by month (₹ thousand)'])}</div>
+<p class="foot">Glow2.0 offers make up the three biggest campaigns. August was the peak month at ₹4.8 L.</p>`,
+()=>{bar('r1',D.promo.map(p=>p[0]),D.promo.map(p=>Math.round(p[1]/1000)),B,{indexAxis:'y'});ch('r2','line',pmo,[{data:pmo.map(k=>Math.round(pm[k]/1000)),borderColor:A,backgroundColor:A+'22',fill:true,tension:.3}])});
+
+const L=D.lap;
+page('lap','Lapsers','Clients not seen for 180 days and the calling outcome',
+`<div class="g k">${kpi('Calls logged',659,'')}${kpi('Not connected','349','53% of calls',53)}${kpi('Remind later',139,'21%')}${kpi('Declined further calls',155,'24%')}${kpi('Appointment booked',16,'2.4% of calls')}</div>
+<div class="g two">${cv(['l1','Call outcome'])}<div class="c"><h3>Read-out</h3><ul><li>More than half of calls do not connect; trying a second time slot or WhatsApp may lift this.</li><li>The 139 “remind me later” clients are the warmest leads, so schedule follow-ups for them.</li><li>Top-up (product lapsers) has no Juhu rows at present.</li></ul></div></div>`,
+()=>dn('l1',['Not connected','Remind later','Declined','Booked'],[349,139,155,16]));
+
+const tk=['x'];
+page('trend','Yearly trends','Any metric, month by month, this year vs last year',
+`<div class="c" style="margin-bottom:14px"><h3>Metric</h3><select id="sel">${tk.map(k=>`<option>${k}</option>`).join('')}</select></div><div class="g">${cv(['y1','This year vs last year'])}</div><p class="foot">Money values are in ₹ lakh. This sheet updates every Monday.</p>`,
+()=>{let c;const f=()=>{c&&c.destroy();const k=document.getElementById('sel').value;c=ch('y1','line',M,[{label:'2025',data:D.dash[k][2025],borderColor:B,tension:.3},{label:'2026',data:D.dash[k][2026],borderColor:A,backgroundColor:A+'22',fill:true,tension:.3}])};document.getElementById('sel').onchange=f;f()});
+
+const ext=(id,html,fn)=>{const o=P.find(p=>p.id==id);o.html+=html;const f=o.fn;o.fn=()=>{f();fn&&fn()}};
+const H=t=>`<h2 class="t" style="font-size:18px;margin:26px 0 8px">${t}</h2>`;
+const p1=x=>(x*100).toFixed(1)+'%',cs=x=>`<span class="${x>=0?'up':'dn'}">${x>=0?'+':''}${(x*100).toFixed(1)}%</span>`,sum=(a,n=10)=>a.slice(0,n).reduce((x,y)=>x+(y||0),0),nm=s=>s.replace(/_/g,' ');
+const opt=a=>a.map(x=>`<option>${x}</option>`).join('');
+const sel=(id,a)=>`<select id="${id}">${opt(a)}</select>`;
+
+page('home','Data freshness','When each sheet was last updated, and how often it should be',
+`<div class="g k">${kpi('Sheets in the workbook',14,'')}${kpi('Updated today',6,'24 Oct')}${kpi('Overdue','2','Glow calling list, Glow cumulative',null)}${kpi('Empty for Juhu',2,'Top-up data, Lapsers client list')}</div>
+<div class="c">${tbl(['Sheet','Last updated','Cadence','Age (days)','Status'],[['Prebooking','24 Oct','Daily',0],['Daily report','24 Oct','Daily',0],['MTD comparison','24 Oct','Daily',0],['Employee performance','24 Oct','Daily',0],['Employee monthly + HR master','19 Oct','Weekly (Mon)',5],['Dashboard','19 Oct','Weekly (Mon)',5],['Incentive','23 Oct','Mon–Fri',1],['Promotions','24 Oct','Daily',0],['Category performance','24 Oct','Daily',0],['Glow cumulative','12 Oct','Weekly (Mon)',12],['Glow calling list','6 Sep','Monthly (1st week)',48]].map(r=>[...r,`<span class="${r[3]>7?'dn':'up'}">${r[3]>7?'Overdue':'Current'}</span>`]))}</div>
+<p class="foot">Not in this workbook: NOS NOP and Product Lapsers (listed in the Index). Therapist Earnings repeats the Employee performance data, so it is shown on that page.</p>`,()=>{});
+
+const NR=[1.49,1.52,1.017,30.43,25.31,.832,37,34.11,.922],PR=[.17,.09,.549,3.64,2.18,.599,4.5,2.94,.653],CL=[23,18,.783,492,392,.797,600,528,.881];
+const blk=(n,u,r)=>[n,r[0]+u,r[1]+u,p1(r[2]),r[3]+u,r[4]+u,p1(r[5]),r[6]+u,r[7]+u,p1(r[8])];
+page('tgt','Target vs achievement','Daily report: net + redemption, product, clients, slabs',
+`<div class="g k">${kpi('Net + redemption MTD','83.2%','₹25.31 L of ₹30.43 L',83.2)}${kpi('Product MTD','59.9%','₹2.18 L of ₹3.64 L',59.9)}${kpi('Clients MTD','79.7%','392 of 492',79.7)}${kpi('Slab 1 / Slab 2','68.4% / 61.7%','₹25.3 L of ₹37 L / ₹41 L',68.4)}</div>
+<div class="g two">${cv(['t1','Achievement % by block'])}<div class="c"><h3>What it takes to finish the month</h3><ul><li>Slab 1 needs <b>₹11.69 L</b> more, about ₹1.67 L a day for 7 days, against ₹1.52 L today.</li><li>Clients need 208 more to reach 600, about 30 a day; today had 18 against a target of 23.</li><li>Product sales are projected at ₹2.94 L, 65% of the ₹4.5 L target; 48.4% is achieved so far against the full-month target.</li></ul></div></div>
+<div class="c w"><h3>Target blocks</h3>${tbl(['Block','Today target','Today','%','MTD target','MTD','%','Month target','Run','%'],[blk('Net + redemption',' L',NR),blk('Product sales',' L',PR),blk('Clients','',CL)])}</div>
+${H('Slabs and product target')}<div class="c w">${tbl(['Item','Target','Today','Month to date','Achievement'],[['Slab 1','₹37,00,000','₹1,85,000 (today target)','₹25,30,898','68.4%'],['Slab 2','₹41,00,000','₹1,85,000 (today target)','₹25,30,898','61.7%'],['Product target','₹4,50,000','₹9,330','₹2,18,017','48.4%']])}</div>
+${H('Daily metrics')}<div class="c w">${tbl(['Metric','MTD till yesterday','Today','MTD incl. today'],D.daily.map(r=>[nm(r[0]),...[1,2,3].map(i=>/Ach/.test(r[0])?p1(r[i]):inr(r[i]))]))}</div>
+<p class="foot">Check with the data team: this table shows 587 clients MTD, while MTD comparison shows 392. The net + redemption row also looks inconsistent (₹86 K till yesterday, ₹2.05 L today).</p>`,
+()=>ch('t1','bar',['Today','MTD','Current run'],[['Net + redemption',NR,A],['Product',PR,B],['Clients',CL,C]].map(([l,r,c])=>({label:l,data:[r[2],r[5],r[8]].map(x=>+(x*100).toFixed(1)),backgroundColor:c,borderRadius:6}))));
+
+ext('mtd',`${H('All metrics')}<div class="c w">${tbl(['Metric','Today','MTD this year','MTD last year','Last month','vs last year'],D.mtdh.map((h,i)=>{const v=k=>D.mtdv[k][i],f=x=>typeof x=='number'?(/%/.test(h)?p1(x):inr(x)):x,a=num(v('MTD CURRENT YEAR')),b=num(v('MTD LAST YEAR'));return [nm(h),f(v('FTD')),f(v('MTD CURRENT YEAR')),f(v('MTD LAST YEAR')),f(v('MTD LAST MONTH')),typeof a=='number'&&typeof b=='number'&&b?(/%/.test(h)?((a-b)*100).toFixed(1)+' pts':cs(a/b-1)):'–']}))}</div>
+<div class="g two" style="margin-top:14px">${cv(['m2','Payment mix, this month (₹)'])}${cv(['m3','Sales mix: products, memberships, packages (₹)'])}</div>`,
+()=>{const g=n=>D.mtd['MTD CURRENT YEAR'][n];dn('m2',['Cash','Card','Custom','Check'],['Cash_Payment','Card_Payment','Custom_Payment','Check_Payment'].map(g));bar('m3',['Products','Memberships','Packages'],['Products_Sales','Memberships_Sales','Packages_Sales'].map(g),C)});
+
+const EM=D.em,EN=Object.keys(EM),MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct'],sv=(n,y)=>EM[n]['SERVICE SALES|'+y]||[];
+const avg=a=>{a=a.slice(0,10).filter(x=>x>0);return a.length?a.reduce((x,y)=>x+y,0)/a.length:0};
+const LFN=EN.filter(n=>sum(sv(n,2025))>0),LF26=LFN.reduce((a,n)=>a+sv(n,2026).slice(0,9).reduce((x,y,i)=>x+(sv(n,2025)[i]>0&&y>0?y:0),0),0),LF25=LFN.reduce((a,n)=>a+sv(n,2025).slice(0,9).reduce((x,y,i)=>x+(y>0&&sv(n,2026)[i]>0?y:0),0),0);
+const t26=EN.reduce((a,n)=>a+sum(sv(n,2026)),0),t25=EN.reduce((a,n)=>a+sum(sv(n,2025)),0);
+ext('emp',`${H('Monthly performance by employee (2026)')}<div class="g k">${kpi('Team service sales, Jan–Oct','₹'+(t26/1e5).toFixed(1)+' L',cs(LF26/LF25-1)+' vs last year, same months Jan–Sep, '+LFN.length+' staff with 2025 history')}${kpi('Employees tracked',EN.length,'')}${kpi('Avg retention',(r=>r.reduce((a,b)=>a+b,0)/r.length)(EN.map(n=>avg(EM[n]['RETENTION %|2026']||[])).filter(x=>x>0)).toFixed(0)+'%','average of staff with data')}</div>
+<div class="c" style="margin-bottom:14px"><h3>Employee and metric</h3>${sel('es',EN)} ${sel('ms',['SERVICE SALES','X ACH','SERVICE ABV','PRODUCT SALES','TOTAL CLIENTS SERVICES','NEW CLIENTS SERVICES','3 MONTH REPEAT CLIENTS','RETENTION %'])}</div>
+<div class="g three">${cv(['x1','This year vs last year'])}${cv(['x3','Change vs last year, by month'])}${cv(['x2','Services performed, 2026 year to date'])}</div><div class="c w" id="xt"></div>
+${H('HR master')}<div class="c w">${tbl(['Code','Name','Joined','Department','Designation','Status','Years'],D.hr.map(r=>{const[d,m,y]=r[2].split('-');return [r[0],r[1].replace(/\b(\w)(\w*)/g,(a,b,c)=>b.toUpperCase()+c.toLowerCase()),r[2],r[3].toLowerCase(),r[4].toLowerCase(),r[5],((new Date(2026,9,24)-new Date(y,m-1,d))/3.156e10).toFixed(1)]}))}</div>
+<p class="foot">Change vs last year compares the same month; “–” or “new” means no 2025 figure for that month; October is left out because the month is still in progress. Therapist Earnings holds the same data as this page.</p>`,
+()=>{let c1,c2,c3;const SUMM=['SERVICE SALES','PRODUCT SALES','TOTAL CLIENTS SERVICES','NEW CLIENTS SERVICES','3 MONTH REPEAT CLIENTS'];const f=()=>{c1&&c1.destroy();c2&&c2.destroy();c3&&c3.destroy();const n=document.getElementById('es').value,k=document.getElementById('ms').value,s=[{label:'2026',data:EM[n][k+'|2026'].slice(0,10),borderColor:A,backgroundColor:A+'22',fill:true,tension:.3}];if(EM[n][k+'|2025'])s.unshift({label:'2025',data:EM[n][k+'|2025'].slice(0,10),borderColor:B,tension:.3});c1=ch('x1','line',MN,s);const mx=Object.entries(D.mix[n]||{}).sort((a,b)=>b[1]-a[1]).slice(0,8);const pts=k=='RETENTION %'||k=='X ACH',ch_=(x,y)=>y>0?(pts?+(x-y).toFixed(1):+((x/y-1)*100).toFixed(1)):null,a6=EM[n][k+'|2026'].slice(0,10),a5=(EM[n][k+'|2025']||[]).slice(0,10),yy=a6.map((x,i)=>i>8?null:ch_(x,a5[i]));c3=bar('x3',MN,yy,yy.map(x=>x>=0?C:col('--red')));
+const fm=x=>k=='SERVICE SALES'||k=='PRODUCT SALES'||k=='SERVICE ABV'?inr(x):x.toLocaleString('en-IN',{maximumFractionDigits:1}),ag=a=>SUMM.includes(k)?sum(a,99):avg(a),rows=EN.map(m=>{const b6=(EM[m][k+'|2026']||[]).slice(0,10),b5=(EM[m][k+'|2025']||[]).slice(0,10),mk=b5.map((x,i)=>i<9&&x>0&&b6[i]>0),T=ag(b6.filter((x,i)=>mk[i])),L=ag(b5.filter((x,i)=>mk[i])),pm=b6.map((x,i)=>i>8?null:ch_(x,b5[i]));const f2=x=>k=='SERVICE SALES'||k=='PRODUCT SALES'?(x/1000).toFixed(1)+'K':fm(x),cl=i=>{const x=b6[i],y=b5[i];if(!(x>0)&&!(y>0))return '–';if(i>8)return `<b>${f2(x)}</b><br><small class="d">MTD</small>`;const c=pm[i];return `<b>${x>0?f2(x):'–'}</b><br><small class="d">${y>0?f2(y):'–'}</small><br>${c==null?'<small class="d">new</small>':`<span class="${c>=0?'up':'dn'}">${c>0?'+':''}${c}${pts?'':'%'}</span>`}`};return [m,fm(T),L?fm(L):'–',L&&T?(pts?(T-L).toFixed(1)+' pts':cs(T/L-1)):'new',...b6.map((x,i)=>cl(i))]});
+document.getElementById('xt').innerHTML='<h3>'+k.toLowerCase()+' by employee: '+(SUMM.includes(k)?'total':'average')+', Jan–Sep, only months with data in both years, and monthly change vs last year'+(pts?' (points)':'')+'</h3><p class="d" style="margin:0 0 8px">Each month shows <b>this year</b> (bold), last year (grey) and the change. Sales are in ₹ thousand. October is month to date.</p>'+tbl(['Employee','2026','2025','Change',...MN],rows);
+c2=bar('x2',mx.map(x=>x[0].toLowerCase()),mx.map(x=>x[1]),C,{indexAxis:'y'})};['es','ms'].forEach(i=>document.getElementById(i).onchange=f);f()});
+
+const dk=Object.keys(D.dash),yt=(k,y)=>sum(D.dash[k][y]||[],9),yc=k=>cs(yt(k,'2026')/yt(k,'2025')-1);
+page('dash','Dashboard','Yearly scorecard: every metric, month by month',
+`<div class="g k">${[['Net+Redemption','Net + redemption',' L'],['Service_Sales','Service sales',' L'],['Product_Sales','Product sales',' L'],['Total_Clients','Clients',''],['New_Clients','New clients',''],['Glow_Count','Glow count','']].map(([k,l,u])=>kpi(l+', Jan–Sep',yt(k,'2026').toLocaleString('en-IN',{maximumFractionDigits:1})+u,yc(k)+' vs '+yt(k,'2025').toLocaleString('en-IN',{maximumFractionDigits:1})+u+' in 2025')).join('')}</div>
+<div class="c" style="margin-bottom:14px"><h3>Metric</h3>${sel('ds',dk.map(nm))}</div><div class="g two">${cv(['y1','This year vs last year'])}${cv(['y2','Growth vs last year, completed months (%)'])}</div>
+<div class="c w"><h3>Full scorecard (money in ₹ lakh)</h3><table><thead><tr><th>Metric</th><th>Row</th>${M.map(m=>`<th>${m}</th>`).join('')}<th>Total</th><th>vs LY</th></tr></thead><tbody>${dk.map(k=>['2025','2026','Last Year','Current Year'].map((y,i)=>{const r=D.dash[k][y]||[],pc=i>1,f=x=>x==null?'':pc?cs(x):x.toLocaleString('en-IN',{maximumFractionDigits:2});return `<tr${i==3?' style="border-bottom:3px solid var(--line)"':''}><td>${i?'':nm(k)}</td><td>${y}</td>${r.slice(0,13).map(x=>`<td>${f(x)}</td>`).join('')}<td>${r[13]!=null&&!pc?cs(r[13]):''}</td></tr>`}).join('')).join('')}</tbody></table></div>
+<p class="foot">“Last Year” and “Current Year” rows show growth against the year before. November and December show −100% because they have no data yet, and October is month to date, so the cards and growth chart use January to September. Updated every Monday.</p>`,
+()=>{let c1,c2,c3;const SUMM=['SERVICE SALES','PRODUCT SALES','TOTAL CLIENTS SERVICES','NEW CLIENTS SERVICES','3 MONTH REPEAT CLIENTS'];const f=()=>{c1&&c1.destroy();c2&&c2.destroy();c3&&c3.destroy();const k=dk[document.getElementById('ds').selectedIndex];c1=ch('y1','line',M,[{label:'2025',data:(D.dash[k]['2025']||[]).slice(0,12),borderColor:B,tension:.3},{label:'2026',data:D.dash[k]['2026'].slice(0,12),borderColor:A,backgroundColor:A+'22',fill:true,tension:.3}]);const g=(D.dash[k]['Current Year']||[]).slice(0,9).map(x=>+(x*100).toFixed(0));c2=bar('y2',MN.slice(0,9),g,g.map(x=>x>=0?C:col('--red')))};document.getElementById('ds').onchange=f;f()});
+
+ext('cat',`${H('All categories')}<div class="c" style="margin-bottom:14px"><h3>Category</h3>${sel('cs',[...new Set(D.cats.map(c=>c[1]))])}</div><div class="g two">${cv(['k1','Monthly services'])}${cv(['k2','Services by department, Jan–Sep'])}</div>
+<div class="c w">${tbl(['Department','Category','Jan–Sep 2025','Jan–Sep 2026','Change'],Object.values(D.cats.reduce((o,c)=>{const k=c[0]+c[1];o[k]=o[k]||[c[0].toLowerCase(),c[1].toLowerCase(),0,0];o[k][c[2]==2025?2:3]+=sum(c.slice(3),9);return o},{})).sort((a,b)=>b[3]-a[3]).map(r=>[r[0],r[1],inr(r[2]),inr(r[3]),r[2]?cs(r[3]/r[2]-1):'new']))}</div>`,
+()=>{const f=()=>{window.kc&&kc.destroy();const n=document.getElementById('cs').value,r=y=>(D.cats.find(c=>c[1]==n&&c[2]==y)||[]).slice(3,13);kc=ch('k1','line',MN,[{label:'2025',data:r(2025),borderColor:B,tension:.3},{label:'2026',data:r(2026),borderColor:A,tension:.3}])};document.getElementById('cs').onchange=f;f();const dp={};D.cats.filter(c=>!/CLIENTS/.test(c[1])).forEach(c=>{dp[c[0]]=dp[c[0]]||[0,0];dp[c[0]][c[2]==2025?0:1]+=sum(c.slice(3),9)});ch('k2','bar',Object.keys(dp),[{label:'2025',data:Object.values(dp).map(x=>x[0]),backgroundColor:G,borderRadius:4},{label:'2026',data:Object.values(dp).map(x=>x[1]),backgroundColor:A,borderRadius:4}])});
+
+ext('glow',`${H('Cumulative Glow count')}<div class="c w">${tbl(['Month','Added','Base to last month','Base visited','Eyebrows','Pedicure','Total benefit','Base spend ₹','Same-month eyebrows','Same-month pedicure'],D.gcum.map(r=>[M[r[0]-1],...r.slice(1).map((x,i)=>i==6?inr(x):x)]))}</div>
+${H('Expired members who still visit')}<div class="g k">${kpi('Warm leads',D.nwarm,'expired, visited since 1 Aug')}${kpi('Free sessions unused',inr(D.warm_bal),'held by these members')}</div>
+<div class="c w">${tbl(['Member','Plan','Expired (days)','Free sessions left','Last visit'],D.warm.map(r=>[r[0],r[1],r[2],r[3],r[4]]))}</div><p class="foot">Showing the 12 with the most free sessions left. The calling list was last updated 6 Sep.</p>`,()=>{});
+
+ext('inc',`${H('All incentive lines')}<div class="c w">${tbl(['Manager','Plan','Employee','Count','Incentive ₹'],D.incrows.map(r=>[r[0],r[1],r[2],r[3],inr(r[4])]))}</div><p class="foot">The target-achievement block on the right of this sheet shows #REF! in the source, so it isn’t shown.</p>`,()=>{});
+ext('promo',`${H('Campaign detail')}<div class="c" style="margin-bottom:14px"><h3>Month</h3>${sel('pms',['All',...pmo,'Oct'].filter((x,i,a)=>a.indexOf(x)==i))}</div><div class="c w" id="ptb"></div>`,
+()=>{const f=()=>{const m=document.getElementById('pms').value;document.getElementById('ptb').innerHTML=tbl(['Month','Campaign','Guest','Guests','Invoices','Qty','Sale ₹','Discount ₹','Invoice ₹'],D.prows.filter(r=>m=='All'||r[0]==m).map(r=>[r[0],r[1],r[2],r[3],r[4],r[5],inr(r[6]),inr(r[7]),inr(r[8])]))};document.getElementById('pms').onchange=f;f()});
+ext('lap',`<p class="foot">The client list is blank for Juhu because its source shows #REF!, so only call counts are shown. 127 remarks are logged in the sheet. Top-up (product lapsers) has no Juhu rows.</p>`,()=>{});
+
+ext('cat',`${H('Month by month, by category')}<div class="c" style="margin-bottom:14px"><h3>View</h3>${sel('mdp',['All departments',...new Set(D.cats.map(c=>c[0]))])} ${sel('mmd',['Compare with last year','Compare with previous month'])}</div><div class="c w" id="mt"></div><p class="foot">Each cell shows this year (bold), the comparison value (grey) and the change. October is month to date, so it has no change figure. Last-year comparison starts from January.</p>`,
+()=>{const f=()=>{const dp=document.getElementById('mdp').value,ly=document.getElementById('mmd').selectedIndex==0,R_={};
+D.cats.forEach(c=>{if(dp!='All departments'&&c[0]!=dp)return;const k=c[0]+'|'+c[1];R_[k]=R_[k]||{d:c[0],n:c[1]};R_[k][c[2]]=c.slice(3,15)});
+const pc=(x,y)=>y>0?+((x/y-1)*100).toFixed(1):null,ch2=v=>v==null?'<small class="d">new</small>':`<span class="${v>=0?'up':'dn'}">${v>0?'+':''}${v}%</span>`;
+const rows=Object.values(R_).filter(r=>r[2026]).sort((a,b)=>sum(b[2026],9)-sum(a[2026],9)).map(r=>{const t=r[2026],l=r[2025]||[];
+const cells=MN.map((m,i)=>{const x=t[i],cmp=ly?l[i]:(i?t[i-1]:null);if(!x&&!cmp)return '–';if(i>8)return `<b>${inr(x)}</b><br><small class="d">MTD</small>`;if(cmp==null)return `<b>${inr(x)}</b><br><small class="d">–</small>`;return `<b>${inr(x)}</b><br><small class="d">${inr(cmp)}</small><br>${ch2(pc(x,cmp))}`});
+const T=sum(t,9),L=sum(l,9);return [`${r.d.toLowerCase()} · ${r.n.toLowerCase()}`,`<b>${inr(T)}</b><br><small class="d">${inr(L)}</small><br>${ch2(pc(T,L))}`,...cells]});
+document.getElementById('mt').innerHTML=tbl(['Category','Jan–Sep',...MN],rows)};['mdp','mmd'].forEach(i=>document.getElementById(i).onchange=f);f()});
+const R=col('--red');
+const spark=(a,c)=>{a=a.filter(x=>x!=null);const mx=Math.max(...a),lo=Math.min(...a),w=110,h=32,pts=a.map((x,i)=>`${(i/(a.length-1)*w).toFixed(1)},${(h-3-(x-lo)/(mx-lo||1)*(h-6)).toFixed(1)}`).join(' ');return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round"/></svg>`};
+const sk=k=>D.dash[k]['2026'].slice(0,10);
+const stc={ok:C,wr:Y,bd:R},st=p=>p>=95?'ok':p>=80?'wr':'bd';
+const tile=(l,v,sub,s,k)=>`<div class="c t ${s}"><h3>${l}</h3><div class="tv"><div class="v">${v}</div>${spark(sk(k),stc[s])}</div><div class="d">${sub}</div></div>`;
+const bl=(l,a,note)=>`<div class="bl"><div class="bh"><span>${l}</span><b>${a}%</b></div><div class="bt ${st(a)}"><i style="width:${Math.min(a,120)/1.2}%"></i><u></u></div><div class="d">${note}</div></div>`;
+const pl=(c,t,x)=>`<div class="pl ${c}"><b>${t}</b><p>${x}</p></div>`;
+page('exec','Executive summary','Where Juhu stands today, what is at risk, and what to do next',
+`<div class="c hd"><div><h3>October 2026 · day 24 of 31</h3><div class="hl">Revenue is <b class="up">12% ahead of last year</b>, but the month is on course to finish about <b class="dn">₹2.9 L short</b> of the ₹37 L Slab 1 target.</div></div>
+<div class="sc"><span><i style="background:${C}"></i>2 on track</span><span><i style="background:${Y}"></i>1 watch</span><span><i style="background:${R}"></i>3 behind</span></div></div>
+<div class="g k6">${tile('Net + redemption, MTD','₹25.31 L','83% of MTD target · +12.3% vs last year','wr','Net+Redemption')}${tile('Clients, MTD','392','80% of MTD target · +4.8% vs last year','bd','Total_Clients')}${tile('Average bill','₹4,349','+4.2% vs last year','ok','Abv')}${tile('Product sales, MTD','₹2.18 L','60% of MTD target · ₹2.32 L short of month','bd','Product_Sales')}${tile('New clients, MTD','51','+50% vs last year (34)','ok','New_Clients')}${tile('Active Glow members','31','of 689 · 88% expired over 90 days','bd','Glow_Count')}</div>
+<div class="g two"><div class="c"><h3>Progress against target (marker = 100%)</h3>${bl('Net + redemption, MTD vs MTD target',83.2,'₹25.31 L of ₹30.43 L')}${bl('Net + redemption, projected vs month target',92.2,'₹34.11 L projected of ₹37 L')}${bl('Clients, MTD vs MTD target',79.7,'392 of 492')}${bl('Clients, projected vs month target',88.1,'528 projected of 600')}${bl('Product, MTD vs MTD target',59.9,'₹2.18 L of ₹3.64 L')}${bl('Product, projected vs month target',65.3,'₹2.94 L projected of ₹4.5 L')}</div>
+<div class="c"><h3>Net + redemption by month, ₹ lakh (Oct to date)</h3><canvas id="x_a"></canvas></div></div>
+<div class="g two"><div class="c"><h3>Needs attention</h3>${pl('bd','Product sales are the weakest target','60% of the MTD target; it needs ₹2.32 L more in 7 days. Product sales peaked at ₹5.1 L in August.')}${pl('bd','Glow membership base has lapsed','607 of 689 members expired over 90 days ago. 126 of them still visited since August and hold 1,278 free sessions. Glow sales have also fallen from about 54 a month in 2025 to about 11 since Glow 2.0 replaced it in February.')}${pl('bd','Lapser calling is not converting','53% of 659 calls did not connect and only 16 booked (2.4%).')}${pl('wr','Fewer clients, higher spend','Clients are down 6.6% for Jan–Sep (3,926 vs 4,203) while revenue is up 19.8%. Growth is coming from spend per client, so footfall needs attention. In the September chain snapshot Juhu’s footfall growth (+2.6%) ranked 14th of 14 against a chain average of +18.3%.')}${pl('wr','Waxing demand is falling','Female waxing is down 13.3% and unique waxing clients down 15.6% (Jan–Sep vs last year).')}</div>
+<div class="c"><h3>Going well</h3>${pl('ok','Revenue and bills are up on last year','Net + redemption +12.3%, net cash +19.3%, average bill +4.2%.')}${pl('ok','New clients are growing fast','51 so far against 34 last year; they are 13% of clients.')}${pl('ok','Hair leads the team','Hair is 62% of service revenue; Maleeha Jafferbhoy and Amir Khan alone bring in ₹8.0 L.')}${pl('ok','Pre-booking is nearly full','99% of target for tomorrow, with ₹40.5 K of services booked.')}</div></div>
+<div class="g three"><div class="c"><h3>Top 5 by service revenue (₹ thousand)</h3><canvas id="x_b"></canvas></div><div class="c"><h3>Service revenue by department</h3><canvas id="x_c"></canvas></div>
+<div class="c"><h3>Recommended actions this week</h3><ol class="ac"><li>Call the 126 expired Glow members who still visit and offer a renewal.</li><li>Add a product recommendation to every bill; Slab 1 needs ₹1.67 L a day and product is furthest behind.</li><li>Re-call the 139 “remind me later” lapsers, at a different time of day.</li><li>Fill the empty nail slots; none are pre-booked.</li></ol></div></div>
+<p class="foot">Status colours: green 95% or more of target, amber 80–95%, red below 80%. Sparklines show January to October 2026 (October to date).</p>`,
+()=>{ch('x_a','line',M,[{label:'2025',data:D.dash['Net+Redemption']['2025'].slice(0,12),borderColor:B,tension:.3},{label:'2026',data:D.dash['Net+Redemption']['2026'].slice(0,12),borderColor:A,backgroundColor:A+'22',fill:true,tension:.3}]);const e=D.emp.slice(0,5);bar('x_b',e.map(x=>x[0].split(' ')[0]),e.map(x=>Math.round(x[2]/1000)),A,{indexAxis:'y'});const d=Object.entries(D.dept).filter(x=>x[1][1]>0);dn('x_c',d.map(x=>x[0].split(' ')[0].toLowerCase()),d.map(x=>x[1][1]))});
+// ---- NSH workbook additions ----
+const HS=NS.hist,hl=HS.map(h=>M[h[1]-1]+' '+String(h[0]).slice(2)),hp=HS.map(h=>h[4]/h[2]*100),pp=HS.map(h=>h[7]>0?h[8]/h[7]*100:null),hit=a=>a.filter(x=>x>=100).length,l12=a=>a.slice(-12);
+let pk=pp.length-1;while(pk>0&&!(pp[pk]<100))pk--;let miss=0;while(pk>=0&&pp[pk]!=null&&pp[pk]<100){miss++;pk--}
+const yrs=[...new Set(HS.map(h=>h[0]))];
+page('hist','Target history','Slab 1 and product target against actual, every month since January 2023',
+`<div class="g k">${kpi('Latest month, Aug 2026',hp.at(-1).toFixed(1)+'%','Slab 1: ₹34.21 L of ₹35 L',hp.at(-1))}${kpi('Slab 1 hit, last 12 months',hit(l12(hp))+' of 12','best month '+Math.max(...l12(hp)).toFixed(0)+'%')}${kpi('Product target hit, last 12 months',hit(l12(pp))+' of 12','Jul and Aug 2026')}${kpi('Slab 1 hit since Jan 2023',hit(hp)+' of '+HS.length,'months')}</div>
+<div class="g">${cv(['h1','Actual against Slab 1 target (₹ lakh)'])}</div><div class="g two">${cv(['h2','Slab 1 and product achievement (%)'])}<div class="c"><h3>What the history shows</h3><ul><li>Slab 1 achievement has improved every month since March 2026, from 78% to 98% in August.</li><li>Slab 1 targets were cut from ₹41 L (Jan 2025) to ₹31 L (Jan 2026), then raised to ₹35 L from March 2026.</li><li>The Slab 1 target was last hit in November 2025 (107%).</li><li>The product target was hit in July and August 2026, after ${miss} straight months of misses.</li></ul></div></div>
+<div class="c w"><h3>By year</h3>${tbl(['Year','Months','Avg Slab 1 target ₹ L','Avg actual ₹ L','Avg achievement','Slab 1 hit','Avg product achievement','Product hit'],yrs.map(y=>{const r=HS.map((h,i)=>[h,i]).filter(x=>x[0][0]==y),av=f=>r.reduce((a,x)=>a+f(x),0)/r.length;return [y,r.length,(av(x=>x[0][2])/1e5).toFixed(1),(av(x=>x[0][4])/1e5).toFixed(1),av(x=>hp[x[1]]).toFixed(1)+'%',r.filter(x=>hp[x[1]]>=100).length,(r2=>r2.length?(r2.reduce((a,x)=>a+pp[x[1]],0)/r2.length).toFixed(1)+'%':'–')(r.filter(x=>pp[x[1]]!=null)),r.filter(x=>pp[x[1]]>=100).length]}))}</div>
+<p class="foot">From the NSH workbook. The latest month in that sheet is August 2026. Slab achievement is net + redemption.</p>`,
+()=>{ch('h1','bar',hl,[{label:'Actual',data:HS.map(h=>+(h[4]/1e5).toFixed(2)),backgroundColor:A,borderRadius:3},{label:'Slab 1 target',data:HS.map(h=>+(h[2]/1e5).toFixed(2)),type:'line',borderColor:B,stepped:true,pointRadius:0}]);ch('h2','line',hl,[{label:'Slab 1 %',data:hp.map(x=>+x.toFixed(1)),borderColor:A,tension:.3,pointRadius:0},{label:'Product %',data:pp.map(x=>x==null?null:+x.toFixed(1)),borderColor:C,tension:.3,pointRadius:0},{label:'100%',data:hl.map(()=>100),borderColor:G,borderDash:[4,4],pointRadius:0}])});
+
+const f24=NS.ff24,dC=k=>D.dash['Total_Clients'][k],ap=a=>sum(a,6),wdN=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],wdT=NS.wd.reduce((a,b)=>a+b,0);
+page('ff','Footfall and busy days','Clients over three years, and which days of the week carry the sales',
+`<div class="g k">${kpi('Clients Apr–Sep 2024',inr(ap(f24)),'FY24-25 sheet')}${kpi('Clients Apr–Sep 2025',inr(sum(dC('2025').slice(3),6)),cs(sum(dC('2025').slice(3),6)/ap(f24)-1)+' vs 2024')}${kpi('Clients Apr–Sep 2026',inr(sum(dC('2026').slice(3),6)),cs(sum(dC('2026').slice(3),6)/sum(dC('2025').slice(3),6)-1)+' vs 2025')}${kpi('Best day since Jan 2025','₹2.54 L','23 Dec 2025 · ₹2.05 L if Nov–Dec are excluded (11 Oct 2025)')}</div>
+<div class="g two">${cv(['f1','Clients by month, 3 years'])}${cv(['f2','Average sales by weekday (₹ lakh a day)'])}</div>
+<div class="g two"><div class="c"><h3>Weekday pattern</h3><ul><li>Saturday averages ₹${NS.wd[5].toFixed(2)} L, about ${(NS.wd[5]/NS.wd[0]).toFixed(1)} times Monday (₹${NS.wd[0].toFixed(2)} L).</li><li>Saturday and Sunday bring ${((NS.wd[5]+NS.wd[6])/wdT*100).toFixed(0)}% of a week’s sales from 2 of 7 days.</li><li>Monday and Tuesday are the quietest; they suit offers that fill empty chairs.</li><li>Clients are down ${(Math.abs(sum(dC('2026').slice(3),6)/ap(f24)-1)*100).toFixed(1)}% on two years ago (Apr–Sep), while spend per client has risen.</li></ul></div>
+<div class="c w"><h3>Biggest sales days, Oct 2024 – Jun 2025 (₹ lakh)</h3>${tbl(['Date','Sales'],NS.bestdays.map(d=>[d[0],d[1].toFixed(2)]))}</div></div>
+<p class="foot">Daily sales cover 1 Oct 2024 to 30 Jun 2025 (273 days). The Walk-in Wed &amp; Mon sheet is West-region level, so it is not shown for Juhu.</p>`,
+()=>{ch('f1','line',M,[{label:'2024',data:[null,null,null,...f24.slice(0,9)],borderColor:G,tension:.3},{label:'2025',data:dC('2025').slice(0,12),borderColor:B,tension:.3},{label:'2026',data:dC('2026').slice(0,9),borderColor:A,backgroundColor:A+'22',fill:true,tension:.3}]);bar('f2',wdN,NS.wd,NS.wd.map((x,i)=>i>4?A:G))});
+
+const NB=NS.brand,bk=Object.entries(NB).map(([k,v])=>[k,sum(v[2025].v,12),sum(v[2025].c,12)]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]),bt=bk.reduce((a,x)=>a+x[1],0);
+page('prodb','Product brands','Product sales by brand, January to September 2025',
+`<div class="g k">${kpi('Brand sales, Jan–Sep 2025','₹'+(bt/1e5).toFixed(1)+' L','across '+bk.length+' brands')}${kpi('Top brand',bk[0][0],'₹'+(bk[0][1]/1e5).toFixed(1)+' L · '+(bk[0][1]/bt*100).toFixed(0)+'% of sales')}${kpi('Top 3 brands',(bk.slice(0,3).reduce((a,x)=>a+x[1],0)/bt*100).toFixed(0)+'%','of brand sales')}${kpi('Units sold',inr(bk.reduce((a,x)=>a+x[2],0)),'avg ₹'+inr(bt/bk.reduce((a,x)=>a+x[2],0))+' each')}</div>
+<div class="g two">${cv(['b1','Share of product sales'])}${cv(['b2','Value by brand (₹ thousand)'])}</div>
+<div class="c w"><h3>All brands</h3>${tbl(['Brand','Value ₹','Units','Avg price ₹','Share'],bk.map(x=>[x[0].toLowerCase(),inr(x[1]),x[2],inr(x[1]/x[2]),(x[1]/bt*100).toFixed(1)+'%']))}</div>
+<p class="foot">The brand sheet has 2025 only; 2026 rows are missing, so there is no year-on-year view yet. Please share 2026. It reconciles to within 4% of 2025 product sales on the Dashboard sheet.</p>`,
+()=>{const t=bk.slice(0,6);dn('b1',[...t.map(x=>x[0].toLowerCase()),'others'],[...t.map(x=>x[1]),bt-t.reduce((a,x)=>a+x[1],0)]);bar('b2',bk.slice(0,10).map(x=>x[0].toLowerCase()),bk.slice(0,10).map(x=>Math.round(x[1]/1000)),C,{indexAxis:'y'})});
+
+const GL=NS.glow,g25=GL['Glow|2025'],g26=GL['Glow|2026'],g2=GL['Glow 2.0|2026'];
+ext('glow',`${H('Glow and Glow 2.0 sales')}<div class="g k">${kpi('Jan–Aug 2025 (Glow)',sum(g25,8),'≈ '+(sum(g25,8)/8).toFixed(0)+' a month')}${kpi('Jan–Aug 2026 (Glow + Glow 2.0)',sum(g26,8)+sum(g2,8),cs((sum(g26,8)+sum(g2,8))/sum(g25,8)-1)+' vs 2025')}${kpi('Glow 2.0, Mar–Aug 2026',sum(g2.slice(2),6),'≈ '+(sum(g2.slice(2),6)/6).toFixed(0)+' a month')}</div><div class="g two">${cv(['gt1','Memberships sold by month'])}<div class="c"><h3>Reading the drop</h3><ul><li>The fall in Glow count on the Dashboard is real, not a counting change: the old Glow stopped after February and Glow 2.0 started in February 2026.</li><li>Glow 2.0 sells about 11 a month against about 54 for the old Glow last year.</li><li>Fewer new members also means fewer renewals ahead; the expired base is the bigger lever.</li></ul></div></div><p class="foot">Source: NSH workbook, Glow_Total sheet.</p>`,
+()=>ch('gt1','bar',M,[{label:'2025 Glow',data:g25,backgroundColor:G,stack:'a',borderRadius:3},{label:'2026 Glow',data:g26,backgroundColor:A,stack:'b'},{label:'2026 Glow 2.0',data:g2,backgroundColor:B,stack:'b'}],{scales:{x:{stacked:true},y:{stacked:true}}}));
+
+const RB=NS.rebook,rc=NS.rebook_chain,rm=['Jun','Jul','Aug (to 24th)'],rj=RB['Rebooked'].map((x,i)=>+(x/RB['No of Clients'][i]*100).toFixed(1)),rcc=rc.map(x=>+(x[1]/x[0]*100).toFixed(1));
+ext('lap',`${H('Re-booking')}<div class="g k">${kpi('June',rj[0]+'%','chain '+rcc[0]+'%')}${kpi('July',rj[1]+'%','chain '+rcc[1]+'%')}${kpi('August, to the 24th',rj[2]+'%','chain '+rcc[2]+'%')}${kpi('Clients rebooked, Jun–Aug',sum(RB['Rebooked']),'of '+inr(sum(RB['No of Clients']))+' clients')}</div><div class="g two">${cv(['rb1','Juhu against chain average (% of clients who rebook)'])}<div class="c"><h3>Reading it</h3><ul><li>Juhu rebooks more clients than the chain average in all three months (about ${rj[0]}%, ${rj[1]}% and ${rj[2]}%).</li><li>Even so, fewer than 1 in 10 clients books their next visit before leaving; every extra point is roughly ${Math.round(RB['No of Clients'][1]/100)} more booked visits a month.</li></ul></div></div><p class="foot">This sheet was last updated on 24 Aug 2026, so September and October are missing.</p>`,
+()=>ch('rb1','bar',rm,[{label:'Juhu',data:rj,backgroundColor:A,borderRadius:6},{label:'Chain average',data:rcc,backgroundColor:G,borderRadius:6}]));
+
+const PN=NS.partner['LUZO|NetAmount|2026'],PI=NS.partner['LUZO|InvoiceCount|2026'],RW=NS.raise,rj_=RW.find(x=>x[0]=='Juhu'),rtot=RW.reduce((a,x)=>[a[0]+x[1],a[1]+x[2]],[0,0]),rrk=[...RW].sort((a,b)=>b[2]/b[1]-a[2]/a[1]).findIndex(x=>x[0]=='Juhu')+1;
+ext('promo',`${H('Partner brand sales (LUZO)')}<div class="g k">${kpi('Net sales, Jan–Sep 2026','₹'+inr(sum(PN,9)),'')}${kpi('Invoices',sum(PI,9),'avg bill ₹'+inr(sum(PN,9)/sum(PI,9)))}${kpi('Best month','Aug','₹'+inr(PN[7])+' · '+PI[7]+' invoices')}${kpi('Zomato partner sales, Jan–Sep','₹'+inr(sum(NS.partner['ZOMATO|NetAmount|2026'],9)),sum(NS.partner['ZOMATO|InvoiceCount|2026'],9)+' invoices')}</div><div class="g">${cv(['pn1','LUZO net sales by month, 2026 (₹ thousand)'])}</div>
+${H('Raise weekend, 7–9 Nov 2025')}<div class="g k">${kpi('Product sales',  '₹'+inr(rj_[1]),'over the 3 days')}${kpi('Raise products','₹'+inr(rj_[2]),(rj_[2]/rj_[1]*100).toFixed(0)+'% of product sales')}${kpi('Chain share of Raise',(rtot[1]/rtot[0]*100).toFixed(0)+'%','Juhu ranks '+rrk+' of '+RW.length+' on share')}</div><p class="foot">Source: NSH workbook, Partner_Sales and Raise Weekend sheets. The Raise sheet’s own total row (₹4.9 L) does not match the sum of its salons (₹10.1 L); the share above uses the salon rows.</p>`,
+()=>bar('pn1',M.slice(0,9),PN.slice(0,9).map(x=>Math.round(x/1000)),C));
+
+ext('exec','',()=>{});
+const rkc=(v,k)=>{const g=k.includes('growth')||1;return v[0]<=v[1]/3?'up':v[0]>=v[1]*2/3?'dn':''};
+P.find(p=>p.id=='exec').html=P.find(p=>p.id=='exec').html.replace('<p class="foot">Status colours',`<div class="c w" style="margin-bottom:14px"><h3>Where Juhu stands in the chain, ${Object.values(NS.rank)[0][1]} salons, September close</h3>${tbl(['Measure','Juhu','Chain average','Rank'],Object.entries(NS.rank).map(([k,v])=>[k,(v[3]*100).toFixed(1)+'%',(v[2]*100).toFixed(1)+'%',`<b class="${rkc(v,k)}">${v[0]} of ${v[1]}</b>`]))}</div><p class="foot">Status colours`);
+const hm=P.find(p=>p.id=='home');hm.html=hm.html.replace('<p class="foot">Not in this workbook',`${H('From the NSH workbook')}<div class="c w">${tbl(['Data','Covers','Status'],[['Target history','Jan 2023 – Aug 2026, monthly','Sep and Oct not yet in sheet'],['Glow and Glow 2.0','Oct 2024 – Aug 2026','Current'],['Re-booking','Jun – Aug 2026','<span class="dn">Last updated 24 Aug (overdue)</span>'],['Partner (LUZO) sales','Jan – Sep 2026','Current'],['Product brands','Jan – Sep 2025 only','<span class="dn">2026 missing</span>'],['Daily sales and weekday pattern','1 Oct 2024 – 30 Jun 2025','Static analysis'],['Footfall, FY24-25','Apr 2024 – Mar 2025','Static'],['Chain ranking','September close snapshot','Static'],['Raise weekend','7–9 Nov 2025','One-off event']])}</div><p class="foot">Not used: Come Back (no year or definition), the daily Footfall sheet (month unclear), Walk-in Wed &amp; Mon (West region only), daily target sheets (no Juhu actuals). Privé Member has no Juhu rows.</p><p class="foot">Not in this workbook`);
+
+const GR={exec:'Executive',tgt:'Performance',emp:'People',promo:'Growth',home:'Reference'};
+
+const ORD=['exec','tgt','hist','pre','mtd','ff','dash','emp','inc','promo','prodb','glow','lap','cat','home'];
+const PP=ORD.map(id=>[...P].reverse().find(p=>p.id==id));P.length=0;P.push(...PP);
+
+const mn=document.getElementById('m'),nv=document.getElementById('nav');
+mn.insertAdjacentHTML('afterbegin','<div class="band"><span class="chip"><b>Store</b>'+META.salon+'</span><span class="chip"><b>Month</b>'+META.month+'</span><span class="chip"><b>Data as of</b>'+META.asOf+'</span><span class="chip"><b>Amounts</b>₹ (1 lakh = 1,00,000)</span></div>');
+P.forEach(p=>{mn.insertAdjacentHTML('beforeend',`<section id="${p.id}"><h2 class="t">${p.name}</h2><p class="s">${p.sub}</p>${p.html}</section>`);if(GR[p.id])nv.insertAdjacentHTML('beforeend',`<div class="gh">${GR[p.id]}</div>`);nv.insertAdjacentHTML('beforeend',`<button data-p="${p.id}">${p.name}</button>`)});
+const done={};
+function go(id){document.querySelectorAll('section,aside button').forEach(x=>x.classList.remove('on'));document.getElementById(id).classList.add('on');document.querySelector(`[data-p=${id}]`).classList.add('on');if(!done[id]){done[id]=1;P.find(p=>p.id==id).fn()}scrollTo(0,0)}
+nv.onclick=e=>e.target.dataset.p&&go(e.target.dataset.p);
+go('exec');
+
+}
+(async()=>{const{data:{session}}=await sb.auth.getSession();if(session)await afterLogin(session);else show('loginView')})();
+</script></body></html>
