@@ -1,0 +1,146 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Salon SBM Dashboard</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#eef1f5;--card:#fff;--tt:#f6f8fb;--ink:#1d2733;--mut:#5f6b7a;--line:#dde3ea;--a:#4e79a7;--b:#f28e2b;--c:#59a14f;--red:#e15759;--w:#fff;--nav:#1b2a41;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f1724;--card:#172131;--tt:#1c2a3f;--ink:#e8edf5;--mut:#9aa8bd;--line:#2a3850;--a:#6aa0d6;--b:#f6a85a;--c:#7bc171;--red:#ff7b7e;--w:#0f1724;--nav:#0a111c}}
+:root[data-theme=dark]{--bg:#0f1724;--card:#172131;--tt:#1c2a3f;--ink:#e8edf5;--mut:#9aa8bd;--line:#2a3850;--a:#6aa0d6;--b:#f6a85a;--c:#7bc171;--red:#ff7b7e;--w:#0f1724;--nav:#0a111c}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 14px/1.5 Manrope,system-ui,sans-serif;min-height:100vh}
+#appRoot{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+aside{background:var(--nav);padding:20px 12px;position:sticky;top:0;height:100vh;overflow:auto;color:#dbe4f0}
+aside h1{font-size:18px;font-weight:800;margin:0 8px 2px;color:#fff}aside small{display:block;color:#8fa3bd;margin:0 8px 12px;font-size:12px}
+.gh{font-size:11px;font-weight:600;color:#7f93ad;margin:16px 10px 4px;letter-spacing:.04em}
+aside button{display:block;width:100%;text-align:left;border:0;border-left:3px solid transparent;background:none;color:#dbe4f0;font:600 13px Manrope,sans-serif;padding:8px 10px;border-radius:0 6px 6px 0;cursor:pointer}
+aside button:hover{background:#ffffff14}aside button.on{background:#ffffff1f;border-left-color:var(--b);color:#fff}aside button:focus-visible{outline:2px solid var(--b)}
+main{padding:0 24px 40px;min-width:0;max-width:1180px}
+.band{display:flex;flex-wrap:wrap;gap:8px;padding:14px 0 6px}.chip{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 12px;font-size:12px;color:var(--mut)}.chip b{color:var(--ink);margin-right:4px}
+h2.t{font-size:24px;margin:8px 0 0;font-weight:800}p.s{color:var(--mut);margin:2px 0 16px}
+section{display:none}section.on{display:block}
+.g{display:grid;gap:14px;margin-bottom:14px}.k{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}.k6{grid-template-columns:repeat(auto-fit,minmax(175px,1fr))}.two{grid-template-columns:repeat(auto-fit,minmax(330px,1fr))}.three{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.c{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:16px;min-width:0;box-shadow:0 1px 2px #0000000a}
+.c h3{font-size:12.5px;margin:-16px -16px 12px;padding:9px 16px;font-weight:700;color:var(--mut);background:var(--tt);border-bottom:1px solid var(--line);border-radius:6px 6px 0 0}
+.v{font-size:24px;font-weight:800}.d{font-size:12px;font-weight:600;color:var(--mut)}.up{color:var(--c)}.dn{color:var(--red)}
+.bar{height:8px;background:var(--line);border-radius:9px;margin:6px 0 10px;overflow:hidden}.bar i{display:block;height:100%;border-radius:9px;background:var(--a)}
+.t{border-left:5px solid var(--line)}.t.ok{border-left-color:var(--c)}.t.wr{border-left-color:#edc948}.t.bd{border-left-color:var(--red)}
+.t h3{margin:0 0 4px;padding:0;background:none;border:0}.tv{display:flex;justify-content:space-between;align-items:center;gap:8px}.t .v{font-size:26px}
+.hd{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:center;margin-bottom:14px}.hd h3{margin-bottom:6px}.hl{font-size:19px;font-weight:600;max-width:680px;line-height:1.4}
+.sc{display:flex;gap:14px;font-weight:600;font-size:13px}.sc i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+.bl{margin-bottom:12px}.bh{display:flex;justify-content:space-between;font-weight:600;font-size:13px}.bt{position:relative;height:12px;background:var(--line);border-radius:3px;margin:4px 0 2px}.bt i{display:block;height:100%;border-radius:3px;background:var(--red)}.bt.ok i{background:var(--c)}.bt.wr i{background:#edc948}.bt u{position:absolute;top:-3px;bottom:-3px;left:83.33%;width:2px;background:var(--ink)}
+.pl{border-left:4px solid var(--line);padding:2px 0 2px 12px;margin-bottom:12px}.pl.bd{border-color:var(--red)}.pl.wr{border-color:#edc948}.pl.ok{border-color:var(--c)}.pl b{font-size:13.5px}.pl p{margin:2px 0 0;color:var(--mut)}
+.ac{padding-left:18px;margin:0}.ac li{margin-bottom:9px}
+table{width:100%;border-collapse:collapse}th,td{text-align:right;padding:7px 6px;border-bottom:1px solid var(--line)}th:first-child,td:first-child{text-align:left}th{color:var(--mut);font-weight:600;font-size:12px}
+.w{overflow-x:auto}canvas{max-height:280px}ul{padding-left:18px;margin:0}li{margin-bottom:7px}select{font:600 13px Manrope;padding:7px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.w td:first-child,.w th:first-child{position:sticky;left:0;background:var(--card)}#xt td,#mt td{white-space:nowrap;line-height:1.35}td small{font-weight:400}
+.foot{color:var(--mut);font-size:12px;margin-top:18px}
+@media(max-width:760px){#appRoot{display:block}aside{position:static;height:auto;display:flex;gap:4px;overflow-x:auto;padding:10px}aside h1,aside small,.gh{display:none}aside button{white-space:nowrap;width:auto;border-left:0;border-radius:6px}main{padding:0 14px 30px}}
+
+.hidden{display:none!important}
+#authRoot{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--nav)}
+.ac{width:100%;max-width:400px;background:var(--card);border-radius:10px;padding:28px;box-shadow:0 8px 30px #0005}
+.ac .brand b{display:block;font-size:20px;font-weight:800}.ac .brand span{color:var(--mut);font-size:12.5px}
+.av{margin-top:18px}.av h2{font-size:17px;margin:0 0 6px}.av p{color:var(--mut);margin:0 0 12px}
+.av label{display:block;font-size:12.5px;font-weight:600;margin:10px 0 4px}
+.av input{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit}
+.av input:focus-visible,.btn:focus-visible{outline:2px solid var(--b)}
+.btn{display:block;width:100%;margin-top:16px;padding:10px;border:0;border-radius:6px;background:var(--a);color:var(--w);font:700 14px Manrope,sans-serif;cursor:pointer}
+.btn.ghost{background:none;color:var(--mut);border:1px solid var(--line)}.btn:disabled{opacity:.6;cursor:wait}
+.lnk{background:none;border:0;color:var(--a);font:600 12.5px Manrope;cursor:pointer;padding:0;margin-top:12px}
+.am{margin-top:14px;padding:9px 12px;border-radius:6px;font-size:13px}.am.err{background:#e1575722;color:var(--red)}.am.ok{background:#59a14f22;color:var(--c)}
+.usr{margin:18px 8px 0;padding-top:12px;border-top:1px solid #ffffff22;font-size:12px;color:#8fa3bd}.usr b{display:block;color:#fff;font-size:13px}
+.usr button{margin-top:6px;padding:6px 10px;border-radius:6px;border:1px solid #ffffff33;background:none;color:#dbe4f0;font:600 12px Manrope;cursor:pointer;width:auto}
+@media(max-width:760px){.usr{display:none}}
+#accModal{position:fixed;inset:0;background:#0009;z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:24px;overflow:auto}
+.am2{background:var(--card);border-radius:10px;max-width:1000px;width:100%;padding:20px}.amh{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:17px}
+.am2 input,.am2 select{padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit;font-size:13px;max-width:100%}
+.am2 table{font-size:13px}.am2 td{vertical-align:middle;text-align:left}.am2 button.s{padding:5px 9px;margin:2px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 12px Manrope;cursor:pointer}
+.pill{padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700}.pill.approved{background:#59a14f33;color:var(--c)}.pill.pending{background:#edc94855;color:var(--ink)}.pill.rejected,.pill.revoked{background:#e1575733;color:var(--red)}
+.arow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;align-items:center}
+</style></head><body>
+<div id="authRoot"><div class="ac"><div class="brand"><b>Management dashboard</b><span>Salon SBM · company data, approved access only</span></div>
+<div id="authMsg" class="am hidden" role="status"></div>
+<div id="loginView" class="av"><p>Sign in with the Google account your administrator has approved. This dashboard has no passwords.</p><button class="btn" id="gBtn">Continue with Google</button><p style="margin-top:14px;font-size:12px">First time here? Sign in once and your request goes to the administrator for approval.</p></div>
+<div id="msgView" class="av hidden"><h2 id="mTitle"></h2><p id="mText"></p><div id="mAdmin" class="hidden"><label for="upFile">Upload dashboard data (admin)</label><input id="upFile" type="file" accept=".json,application/json"></div><button class="btn ghost" id="mOut">Sign out</button></div>
+<div id="loadView" class="av hidden"><p>Checking your access…</p></div></div></div>
+<div id="appRoot" class="hidden"><aside><h1 id="sname">Salon</h1><small>Management dashboard</small><div id="nav"></div>
+<div class="usr"><b id="uName"></b><span id="uRole"></span><div id="storeSel"></div><button id="accBtn" class="hidden">Manage access</button> <button id="upBtn" class="hidden">Upload data</button> <button id="outBtn">Sign out</button><input id="upFile2" type="file" accept=".json,application/json" class="hidden"></div></aside><main id="m"></main></div>
+<div id="accModal" class="hidden" role="dialog" aria-label="Manage access"><div class="am2"><div class="amh"><b>Manage access</b><button id="accClose" class="lnk" style="margin:0">Close</button></div><div id="accBody"></div></div></div>
+<script>
+const SUPABASE_URL="https://mldzrfkjfbgvvlcqiuir.supabase.co",SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1sZHpyZmtqZmJndnZsY3FpdWlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwNjQzMzMsImV4cCI6MjA5ODY0MDMzM30.sLI-va54I96WBYNAGjI3YF_1Q-qHqsL_3JzA_gFyJKg";
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+let me=null,rows=[],busy=false;
+const $=id=>document.getElementById(id),VIEWS=['loginView','msgView','loadView'];
+const esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function show(v){$('appRoot').classList.add('hidden');$('accModal').classList.add('hidden');$('authRoot').classList.remove('hidden');VIEWS.forEach(x=>$(x).classList.toggle('hidden',x!==v));}
+function note(t,k){const b=$('authMsg');if(!t){b.classList.add('hidden');return}b.textContent=t;b.className='am '+(k||'err');}
+function stop(title,text,admin){note('');$('mTitle').textContent=title;$('mText').textContent=text;$('mAdmin').classList.toggle('hidden',!admin);show('msgView');}
+const isAdmin=()=>me&&me.role==='admin'&&me.status==='approved';
+const amr=tok=>{try{return JSON.parse(atob(tok.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).amr||[]}catch(e){return[]}};
+async function afterLogin(session){
+  if(busy)return;busy=true;
+  try{
+    show('loadView');
+    if(!amr(session.access_token).some(a=>a.method==='oauth')){await sb.auth.signOut();show('loginView');note('Password sign-in is not allowed for this dashboard. Please use Google.');return}
+    const{data,error}=await sb.rpc('sbm_get_or_request_access',{p_name:(session.user.user_metadata||{}).full_name||null});
+    if(error){stop('Could not check your access',error.message+' (Has the setup SQL been run?)',false);return}
+    me=Array.isArray(data)?data[0]:data;
+    if(me.status==='approved'){await loadData();return}
+    if(me.status==='pending'){stop('Access request sent','Your request for '+me.email+' is waiting for administrator approval. You can open the dashboard once it is approved.',false);return}
+    stop('Access not available','Access for '+me.email+' has been removed or declined. Contact your administrator.',false);
+  }finally{busy=false}
+}
+async function loadData(){
+  show('loadView');const{data,error}=await sb.from('sbm_salon_data').select('salon,payload,updated_at').order('salon');
+  if(error){stop('Could not load data',error.message,isAdmin());return}
+  rows=data||[];
+  if(!rows.length){const sl=(me.salons||[]).filter(Boolean);if(isAdmin())stop('No data uploaded yet','Upload the dashboard data file to get started.',true);else if(sl.length)stop('Data not loaded yet','You are approved for '+sl.join(', ')+', but dashboard data for '+(sl.length>1?'these salons has':'this salon has')+' not been loaded yet. Ask your administrator.',false);else stop('No salons assigned','No salon is assigned to your account yet. Ask your administrator.',false);return}
+  enterApp();
+}
+function enterApp(){
+  $('uName').textContent=me.full_name||me.email;$('uRole').textContent=me.role==='admin'?'Admin':'Viewer · '+(me.salons||[]).join(', ');
+  $('upBtn').classList.toggle('hidden',!isAdmin());$('accBtn').classList.toggle('hidden',!isAdmin());
+  const ss=$('storeSel');ss.innerHTML=rows.length>1?'<select id="salonPick" aria-label="Salon" style="margin-top:8px;width:100%">'+rows.map((r,i)=>`<option value="${i}">${esc(r.salon)}</option>`).join('')+'</select>':'';
+  if(rows.length>1)$('salonPick').onchange=e=>render(rows[e.target.value]);
+  $('authRoot').classList.add('hidden');$('appRoot').classList.remove('hidden');note('');render(rows[0]);
+}
+function render(r){const p=r.payload;if(!p.view){stop('Data file is out of date','This salon’s data file is an older version. An administrator needs to upload the latest file.',isAdmin());return}$('sname').textContent=r.salon;bootDashboard(p.D,p.NS,{salon:r.salon,month:p.meta.month,asOf:p.meta.asOf},p.view);}
+async function upload(file){
+  try{const p=JSON.parse(await file.text());if(!p.salon||!p.D||!p.NS||!p.meta||!p.view)throw new Error('This is not a dashboard data file.');
+    const{error}=await sb.from('sbm_salon_data').upsert({salon:p.salon,payload:p,updated_at:new Date().toISOString()});if(error)throw error;await loadData();}
+  catch(e){alert('Upload failed: '+e.message)}
+}
+$('upFile').onchange=e=>e.target.files[0]&&upload(e.target.files[0]);
+$('upBtn').onclick=()=>$('upFile2').click();$('upFile2').onchange=e=>e.target.files[0]&&upload(e.target.files[0]);
+async function out(){await sb.auth.signOut();me=null;rows=[];show('loginView')}
+$('outBtn').onclick=out;$('mOut').onclick=out;
+$('gBtn').onclick=async()=>{note('');const{error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+location.pathname,queryParams:{prompt:'select_account'}}});if(error)note(error.message)};
+// ---- Admin: manage access ----
+async function openAccess(msg,kind){
+  $('accModal').classList.remove('hidden');const B=$('accBody');B.textContent='Loading…';
+  const{data,error}=await sb.from('sbm_access').select('*').order('requested_at',{ascending:false});
+  if(error){B.textContent=error.message;return}
+  const known=[...new Set(rows.map(r=>r.salon))];
+  const sel=v=>['viewer','admin'].map(x=>`<option${x===v?' selected':''}>${x}</option>`).join('');
+  B.innerHTML=`${msg?`<div class="am ${kind||'ok'}" role="status">${esc(msg)}</div>`:''}<datalist id="salonList">${known.map(x=>`<option value="${esc(x)}">`).join('')}</datalist>
+  <form id="addAcc" class="arow"><b>Pre-approve:</b><input id="aEmail" type="email" required placeholder="name@gmail.com"><input id="aSal" list="salonList" placeholder="Salons, comma separated"><select id="aRole">${sel('viewer')}</select><button class="s">Add and approve</button></form>
+  <div class="w"><table><thead><tr><th>Person</th><th>Status</th><th>Role</th><th>Salons (comma separated)</th><th>Last sign-in</th><th></th></tr></thead><tbody>${data.map(r=>`<tr data-e="${esc(r.email)}"><td>${esc(r.full_name||'')}<br><small class="d">${esc(r.email)}</small></td><td><span class="pill ${r.status}">${r.status}</span></td><td><select class="rl">${sel(r.role)}</select></td><td><input class="sl" list="salonList" value="${esc((r.salons||[]).join(', '))}"></td><td>${r.last_login_at?new Date(r.last_login_at).toLocaleDateString('en-IN',{day:'numeric',month:'short'}):'–'}</td><td style="white-space:nowrap"><button class="s" data-a="approved">Approve</button><button class="s" data-a="rejected">Reject</button><button class="s" data-a="revoked">Revoke</button><button class="s" data-a="save">Save</button></td></tr>`).join('')||'<tr><td colspan="6">No requests yet.</td></tr>'}</tbody></table></div>`;
+  $('addAcc').onsubmit=async e=>{e.preventDefault();const role=$('aRole').value,sal=parse($('aSal').value);
+    if(role!=='admin'&&!sal.length){alert('Enter at least one salon for a viewer.');return}
+    const email=$('aEmail').value.trim().toLowerCase();
+    const{data:r,error}=await sb.from('sbm_access').upsert({email,status:'approved',role,salons:sal,decided_at:new Date().toISOString(),decided_by:me.email}).select();
+    if(error)alert(error.message);else if(!r||!r.length)alert('Nothing was saved. Sign out and in again, then retry.');else openAccess(email+' approved for '+(role==='admin'?'all salons':sal.join(', '))+'.')};
+  B.onclick=async e=>{const b=e.target.closest('button[data-a]');if(!b)return;const tr=b.closest('tr'),em=tr.dataset.e,a=b.dataset.a;
+    if(em===me.email&&a!=='save'&&a!=='approved'){alert('You cannot remove your own access.');return}
+    const role=tr.querySelector('.rl').value,sal=parse(tr.querySelector('.sl').value);
+    if((a==='approved'||a==='save')&&role!=='admin'&&!sal.length&&!confirm('No salon is entered, so this person will see nothing. Continue anyway?'))return;
+    const patch={role,salons:sal,decided_at:new Date().toISOString(),decided_by:me.email};if(a!=='save')patch.status=a;
+    const{data:r,error}=await sb.from('sbm_access').update(patch).eq('email',em).select();
+    if(error)alert(error.message);else if(!r||!r.length)alert('Nothing was saved. Sign out and in again, then retry.');else openAccess('Saved: '+em+' · '+(a==='save'?'details updated':a)+' · salons: '+(role==='admin'?'all (admin)':(sal.join(', ')||'none')))};
+}
+const parse=t=>t.split(',').map(x=>x.trim()).filter(Boolean);
+$('accBtn').onclick=openAccess;$('accClose').onclick=()=>$('accModal').classList.add('hidden');
+sb.auth.onAuthStateChange(ev=>{if(ev==='SIGNED_OUT'&&!$('appRoot').classList.contains('hidden')){me=null;show('loginView')}});
+function bootDashboard(D,NS,META,view){new Function('D','NS','META',view)(D,NS,META);}
+(async()=>{const{data:{session}}=await sb.auth.getSession();if(session)await afterLogin(session);else show('loginView')})();
+</script></body></html>
